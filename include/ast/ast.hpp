@@ -2,6 +2,7 @@
 
 #include <types/types.hpp>
 #include <token/token.hpp>
+#include "llvm/IR/Value.h"
 
 namespace lang
 {
@@ -50,20 +51,20 @@ namespace lang
 
         struct BaseVisitorForExpression
         {
-            virtual void visit(BinaryExpression* expression) = 0;
-            virtual void visit(GroupingExpression* expression) = 0;
-            virtual void visit(LiteralExpression* expression) = 0;
-            virtual void visit(UnaryExpression* expression) = 0;
-            virtual void visit(VariableExpression* expression) = 0;
-            virtual void visit(AssignmentExpression* expression) = 0;
-            virtual void visit(LogicalExpression* expression) = 0;
-            virtual void visit(CallExpression* expression) = 0;
-            virtual void visit(ParenthesizeExpression* expression) = 0;
+            virtual llvm::Value* visit(BinaryExpression* expression) = 0;
+            virtual llvm::Value* visit(GroupingExpression* expression) = 0;
+            virtual llvm::Value* visit(LiteralExpression* expression) = 0;
+            virtual llvm::Value* visit(UnaryExpression* expression) = 0;
+            virtual llvm::Value* visit(VariableExpression* expression) = 0;
+            virtual llvm::Value* visit(AssignmentExpression* expression) = 0;
+            virtual llvm::Value* visit(LogicalExpression* expression) = 0;
+            virtual llvm::Value* visit(CallExpression* expression) = 0;
+            virtual llvm::Value* visit(ParenthesizeExpression* expression) = 0;
         };
 
         struct Expression
         {
-            virtual void accept(BaseVisitorForExpression* visitor) = 0;
+            virtual llvm::Value* accept(BaseVisitorForExpression* visitor) = 0;
             virtual ~Expression() = default;
         };
 
@@ -199,7 +200,7 @@ namespace lang
                 : left(std::move(left)), right(std::move(right)), op(op)
             {}
 
-            void accept(BaseVisitorForExpression* visitor) override
+            llvm::Value* accept(BaseVisitorForExpression* visitor) override
             {
                 return visitor->visit(this);
             }
@@ -214,7 +215,7 @@ namespace lang
                 : expr(std::move(expr))
             {}
 
-            void accept(BaseVisitorForExpression* visitor) override
+            llvm::Value* accept(BaseVisitorForExpression* visitor) override
             {
                 return visitor->visit(this);
             }
@@ -229,7 +230,7 @@ namespace lang
                 : value(value)
             {}
 
-            void accept(BaseVisitorForExpression* visitor) override
+            llvm::Value* accept(BaseVisitorForExpression* visitor) override
             {
                 return visitor->visit(this);
             }
@@ -244,7 +245,7 @@ namespace lang
                 : op(op), expr(std::move(expr))
             {}
 
-            void accept(BaseVisitorForExpression* visitor) override
+            llvm::Value* accept(BaseVisitorForExpression* visitor) override
             {
                 return visitor->visit(this);
             }
@@ -259,7 +260,7 @@ namespace lang
                 : name(name)
             {}
 
-            void accept(BaseVisitorForExpression* visitor) override
+            llvm::Value* accept(BaseVisitorForExpression* visitor) override
             {
                 return visitor->visit(this);
             }
@@ -275,7 +276,7 @@ namespace lang
                 : name(name), expr(std::move(expr))
             {}
 
-            void accept(BaseVisitorForExpression* visitor) override
+            llvm::Value* accept(BaseVisitorForExpression* visitor) override
             {
                 return visitor->visit(this);
             }
@@ -292,7 +293,7 @@ namespace lang
                 : left(std::move(left)), op(op), right(std::move(right))
             {}
 
-            void accept(BaseVisitorForExpression* visitor) override
+            llvm::Value* accept(BaseVisitorForExpression* visitor) override
             {
                 return visitor->visit(this);
             }
@@ -309,7 +310,7 @@ namespace lang
                 : callee(std::move(callee)), closing_paren(closing_paren), arguments(std::move(arguments))
             {}
 
-            void accept(BaseVisitorForExpression* visitor) override
+            llvm::Value* accept(BaseVisitorForExpression* visitor) override
             {
                 return visitor->visit(this);
             }

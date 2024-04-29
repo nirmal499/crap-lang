@@ -1,7 +1,14 @@
 #include <parser/parser.hpp>
+#include <ast/ast.hpp>
 
 namespace lang
 {
+    Parser::Parser()
+    {}
+
+    Parser::~Parser()
+    {}
+    
     std::pair<std::vector<std::unique_ptr<lang::ast::Statement>>, std::vector<std::string>> Parser::parse(std::vector<lang::Token>&& tokens)
     {
         m_tokens = std::move(tokens);
@@ -14,7 +21,15 @@ namespace lang
 
         while(!this->is_at_end())
         {
-            m_statements.emplace_back(this->parse_declaration());
+            std::unique_ptr<lang::ast::Statement> parsed_statment = this->parse_declaration();
+
+            if(parsed_statment == nullptr)
+            {
+                /* There is an error during parsing a statement, so skip it*/
+                this->synchronize_after_an_error();
+            }
+
+            m_statements.emplace_back(std::move(parsed_statment));
         }
 
         return std::make_pair(std::move(m_statements), std::move(m_errors));;
@@ -22,26 +37,17 @@ namespace lang
 
     std::unique_ptr<lang::ast::Statement> Parser::parse_declaration()
     {
-        try
+       if(this->match({lang::TokenType::FUN}))
         {
-            if(this->match({lang::TokenType::FUN}))
-            {
-                return this->parse_function_statement();
-            }
-            
-            if(this->match({lang::TokenType::VAR}))
-            {
-                return this->parse_var_declaration();
-            }
-
-            return this->parse_statement();
+            return this->parse_function_statement();
         }
-        catch(const std::exception& e)
+        
+        if(this->match({lang::TokenType::VAR}))
         {
-            this->synchronize_after_an_exception();
-
-            return nullptr;
+            return this->parse_var_declaration();
         }
+
+        return this->parse_statement();
     }
 
     std::unique_ptr<lang::ast::Statement> Parser::parse_function_statement()
@@ -485,7 +491,7 @@ namespace lang
         return lang::Token{lang::TokenType::MYEOF, "DEAD END", lang::util::null, 1}; // Unreachable
     }
     
-    void Parser::error(const Token& token, std::string message)
+    std::unique_ptr<lang::ast::Statement> Parser::error(const Token& token, const std::string& message)
     {
         if(token.m_type == lang::TokenType::MYEOF)
         {
@@ -496,10 +502,10 @@ namespace lang
             this->generate_error(token.m_line, " at '" + token.m_lexeme + "' " + message);
         }
 
-        throw lang::util::parser_error("Parser Error Caught");
+        return nullptr;
     }
     
-    void Parser::generate_error(int line, std::string message)
+    void Parser::generate_error(int line, const std::string& message)
     {
         std::stringstream buffer;
         buffer << "[line " << line << "] Error : " << message << "\n";
@@ -531,7 +537,7 @@ namespace lang
         return this->peek().m_type == type;
     }
 
-    void Parser::synchronize_after_an_exception()
+    void Parser::synchronize_after_an_error()
     {
         this->advance();
 

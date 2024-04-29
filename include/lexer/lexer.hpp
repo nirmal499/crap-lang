@@ -1,13 +1,21 @@
 #pragma once
 
 #include <types/types.hpp>
-#include <token/token.hpp>
+#include <types/token_type.hpp>
+#include <vector>
+#include <utility>
+#include <string>
 
 namespace lang
 {
+    class Token;
+    
     class Lexer
     {
         public:
+            Lexer();
+            ~Lexer();
+            
             std::pair<std::vector<lang::Token>, std::vector<std::string>> tokenize(std::string&& source);
 
         private:
@@ -39,9 +47,9 @@ namespace lang
 
             char peekNext();
 
-            void add_token(TokenType type);
+            void add_token(lang::TokenType type);
 
-            void add_token(TokenType type, lang::util::object_t literal);
+            void add_token(lang::TokenType type, lang::util::object_t literal);
 
             /* It returns true if current reaches end of file */
             bool is_at_end();
@@ -66,23 +74,23 @@ namespace lang
 
             std::vector<std::string> m_errors;
 
-            std::unordered_map<std::string, TokenType> m_keywords = {
-                {"and", TokenType::AND},
-                {"class", TokenType::CLASS},
-                {"else", TokenType::ELSE},
-                {"false", TokenType::FALSE},
-                {"for", TokenType::FOR},
-                {"fun", TokenType::FUN},
-                {"if", TokenType::IF},
-                {"nil", TokenType::NIL},
-                {"or", TokenType::OR},
-                {"print", TokenType::PRINT},
-                {"return", TokenType::RETURN},
-                {"super", TokenType::SUPER},
-                {"this", TokenType::THIS},
-                {"true", TokenType::TRUE},
-                {"var", TokenType::VAR},
-                {"while", TokenType::WHILE}
+            std::unordered_map<std::string, lang::TokenType> m_keywords = {
+                {"and", lang::TokenType::AND},
+                {"class", lang::TokenType::CLASS},
+                {"else", lang::TokenType::ELSE},
+                {"false", lang::TokenType::FALSE},
+                {"for", lang::TokenType::FOR},
+                {"fun", lang::TokenType::FUN},
+                {"if", lang::TokenType::IF},
+                {"nil", lang::TokenType::NIL},
+                {"or", lang::TokenType::OR},
+                {"print", lang::TokenType::PRINT},
+                {"return", lang::TokenType::RETURN},
+                {"super", lang::TokenType::SUPER},
+                {"this", lang::TokenType::THIS},
+                {"true", lang::TokenType::TRUE},
+                {"var", lang::TokenType::VAR},
+                {"while", lang::TokenType::WHILE}
             };
     };
 }

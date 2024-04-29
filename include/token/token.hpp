@@ -1,6 +1,6 @@
 #pragma once
 
-#include <token/token_type.hpp>
+#include <types/token_type.hpp>
 #include <types/types.hpp>
 
 namespace lang

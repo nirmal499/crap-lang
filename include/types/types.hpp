@@ -1,17 +1,10 @@
 #pragma once
 
 #include <iostream>
-#include <filesystem>
-#include <fstream>
 #include <string>
-#include <vector>
 #include <variant>
-#include <unordered_map>
-#include <sstream>
 #include <exception>
 #include <iomanip>
-#include <algorithm>
-#include <functional>
 
 namespace lang
 {

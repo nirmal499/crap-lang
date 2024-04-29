@@ -1,16 +1,27 @@
 #pragma once
 
-#include <types/types.hpp>
+#include <memory>
+#include <vector>
+#include <utility>
+#include <string>
 #include <token/token.hpp>
-#include <ast/ast.hpp>
+#include <types/token_type.hpp>
 
 namespace lang
 {
+    namespace ast
+    {
+        struct Statement;
+        struct Expression;
+    }
+
+    // class Token; /* Here in this header file we are not using a pointer to Token. */
+
     class Parser
     {
         public:
-            Parser()
-            {}
+            Parser();
+            ~Parser();
 
             std::pair<std::vector<std::unique_ptr<lang::ast::Statement>>, std::vector<std::string>> parse(std::vector<lang::Token>&& tokens);
 
@@ -50,9 +61,10 @@ namespace lang
 
             lang::Token consume(lang::TokenType type, std::string message);
 
-            void error(const Token& token, std::string message);
+            /* It returns nullptr */
+            std::unique_ptr<lang::ast::Statement> error(const Token& token, const std::string& message);
 
-            void generate_error(int line, std::string message);
+            void generate_error(int line, const std::string& message);
             
             bool match(const std::initializer_list<lang::TokenType>& matching_list);
 
@@ -66,7 +78,7 @@ namespace lang
 
             Token previous();
 
-            void synchronize_after_an_exception();
+            void synchronize_after_an_error();
 
             std::unique_ptr<lang::ast::Expression> parse_single_call_expression_helper_function(std::unique_ptr<lang::ast::Expression> callee);
 

@@ -1,7 +1,11 @@
 #include <lexer/lexer.hpp>
+#include <token/token.hpp>
 
 namespace lang
 {
+    Lexer::Lexer(){}
+    Lexer::~Lexer(){}
+
     std::pair<std::vector<lang::Token>, std::vector<std::string>> Lexer::tokenize(std::string&& source)
     {   
         /* Initialize */

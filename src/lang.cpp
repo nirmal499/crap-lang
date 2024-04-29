@@ -1,14 +1,31 @@
 #include <lang/lang.hpp>
+#include <lexer/lexer.hpp>
+#include <parser/parser.hpp>
+#include <generator/generator.hpp>
+#include <ast/ast.hpp> /* For "statements" variable */
+
+#include <fstream>
 
 namespace lang
 {
-    void Lang::run_source_code(const char* absolute_path_of_source_code)
+    Lang::Lang()
+    {
+        m_lexer = std::make_unique<lang::Lexer>();
+        m_parser = std::make_unique<lang::Parser>();
+        m_generator = std::make_unique<lang::Generator>();
+    }
+
+    Lang::~Lang()
+    {}
+
+    int Lang::run_source_code(const char* absolute_path_of_source_code)
     {
         std::ifstream file(absolute_path_of_source_code);
 
         if(!file.is_open())
         {
-            throw std::runtime_error("Error opening the file");
+            std::cout << "Error opening the file\n";
+            return -1;
         }
 
         file.seekg(0, std::ios::end); /* Seek to end of file */
@@ -24,6 +41,8 @@ namespace lang
         
         /* run the file contents */
         this->run(std::move(file_content));
+
+        return 0;
     }
 
     void Lang::run(std::string&& source)
@@ -60,17 +79,20 @@ namespace lang
         
         /********************************************************************************************************/
 
-        // auto evaluation_errors = m_interpreter->interpret(std::move(statements));
+        auto evaluation_errors = m_generator->generate(std::move(statements));
 
-        // if(evaluation_errors.size() > 0)
-        // {
-        //     std::cout << "\nERROR FOUND DURING EVALUATION:\n";
-        //     for(const auto& error: evaluation_errors)
-        //     {
-        //         std::cout << error << "\n";
-        //     }
+        if(evaluation_errors.size() > 0)
+        {
+            std::cout << "\nERROR FOUND DURING EVALUATION:\n";
+            for(const auto& error: evaluation_errors)
+            {
+                std::cout << error << "\n";
+            }
             
-        //     return;
-        // }
+            return;
+        }
+
+        m_generator->save_module_to_file("out.ll");
+        // m_generator->print_module(); /* Print in the console */
     }
 }
